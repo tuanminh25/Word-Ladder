@@ -11,7 +11,7 @@ A **word ladder** is a connection from one word to another, formed by changing o
 
 The project includes:  
 - **Test cases** for validating correctness  
-- **Benchmarking tools** to measure performance  
+- **Benchmarking methods** to measure performance  
 - **Main driver (`main.cpp`)** for compiling and running the solution  
 
 The implementation is structured to allow easy extension, enabling users to **add more test cases, measure performance, and experiment with different optimizations**.  
