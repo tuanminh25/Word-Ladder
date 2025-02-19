@@ -50,50 +50,12 @@ word_ladder::generate("airplane", "tricycle", engish_words);
 // returns {}
 ```
 
-## 2. Understanding a Word Ladder Implementation
+## **2. Understanding a Word Ladder Implementation**  
 
-Finding a word ladder is a specific instance of a [shortest-path problem][ssp], where the challenge
-is to find the shortest path from a starting position to a goal. Shortest-path problems come up in a
-variety of situations, such as packet routing, robot motion planning, social networks, and studying
-gene mutations. One approach for finding a shortest path is the classic breadth-first search
-algorithm. A breadth-first search searches outward from the start in a radial fashion, until it hits
-the goal. For our word ladder, this means examining those ladders that represent one hop from the
-start. A “hop” is a change in letter. One “hop” from the start means one changed letter, two “hops”
-means two changed letters, and so on. It’s possible for the same position in a word to have letter changes
-across multiple non-adjacent hops. If any of these reach the destination, we’re done. If not, the
-search now examines all the ladders that add one more hop. By expanding the search at each step, all
-one-hop ladders are examined before two-hop ladders, and three-hop ladders are only taken into
-consideration if none of the one-hop or two-hop ladders work out; thus the algorithm is guaranteed
-to find the shortest successful ladder.
+Finding a word ladder is a **shortest-path problem**, commonly seen in **packet routing, robot motion planning, social networks, and gene mutation studies**. To solve this efficiently, I use the **breadth-first search (BFS) algorithm**, which expands outward from the start word in layers until reaching the goal. Each "hop" represents a **single-letter change**, ensuring the shortest path is found.  
 
-Breadth-first searches are typically implemented using a queue. The queue stores partial ladders
-that represent possibilities to explore. The ladders are enqueued in order of increasing length. The
-first elements enqueued are all the one-hop ladders, followed by the two-hop ladders, and so on. Due
-to FIFO handling, ladders will be dequeued in order of increasing length. The algorithm operates by
-dequeuing the front ladder from the queue and determining if it reaches the goal. If it does, then
-you have a complete ladder, and it is the shortest. If not, you take that partial ladder and extend
-it to reach words that are one more hop away, and enqueue those ladders onto the queue, to be
-examined later. If you exhaust the queue of possibilities without having found a completed ladder,
-you can conclude that no ladder exists.
+BFS is implemented using a **queue** that stores word ladders in increasing length order. At each step, I dequeue the shortest ladder, check if it reaches the target, and, if not, extend it by adding valid **one-letter transformations** before re-enqueuing. If no valid ladder is found, I conclude that no solution exists.  
 
-A few of these tasks deserve a bit more explanation. For example, you’ll need to find all the _valid_ words
-that differ by one letter from a given word. You might reach for a raw loop to change each letter to
-all the other letters in the alphabet. You may try something more targetted. Either way, repeat this for each letter position in the word and you will have discovered all the words that are one letter away.
+To generate valid transformations, I systematically modify each letter of the word while ensuring that each transformation forms a valid dictionary word. Additionally, I prevent redundant computations by tracking used words, ensuring words are not revisited in longer ladders. This avoids **cycles** like `cat -> cot -> cog -> bog -> bat -> cat`.  
 
-Another, more subtle issue, is the restriction that you shouldn’t reuse words that have been
-included in a previous ladder. This is an optimisation that avoids exploring redundant paths. For
-example, if you previously tried the ladder `cat->cot->cog` and are now processing `cat->cot->con`,
-you would find that the word `cog` is one letter away from `con`, which looks like a potential
-candidate to extend this ladder. However, `cog` has already been reached in an earlier (and thus
-shorter) ladder, so there is no point in reconsidering it in a longer ladder. The simplest way to
-ensure this is to keep track of the words that have been used in any ladder, and ignore them when
-they resurface. This is also necessary to avoid getting trapped in circular, non-terminating ladders
-such as `cat->cot->cog->bog->bat->cat`. Since you need linear access to all of the items in a
-word ladder when time comes to return it, it makes sense to model an individual word ladder using
-`std::vector<std::string>`. Remember that because C++ has value semantics, you’re able to copy
-vectors via copy construction (e.g. `auto word_ladder_clone = word_ladder;`) and copy assignment
-(e.g. `word_ladder_clone = word_ladder`).
-
-**If there are multiple shortest paths, your implementation must return all the solutions, sorted in
-lexicographical (alphabetical) order. Thus, the return type for your word ladder generator will be
-`std::vector<std::vector<std::string>>`.**
+Since **multiple shortest paths** may exist, my implementation **returns all solutions in lexicographical order**, using `std::vector<std::vector<std::string>>` as the return type. Each word ladder is stored in a `std::vector<std::string>`, allowing efficient cloning and modifications through C++’s value semantics.  
